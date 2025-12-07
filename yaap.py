@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 YAAP - Yet Another Audio Player
 Terminal-based YouTube music player with integrated Cava visualizer and lyrics
@@ -36,8 +36,7 @@ class YouTubeTUI:
         self.lyrics = []
         self.current_lyric_line = 0
         self.show_lyrics = True
-        
-        # Colors
+    
         curses.start_color()
         curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
         curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
@@ -49,13 +48,10 @@ class YouTubeTUI:
         curses.curs_set(0)
         self.stdscr.timeout(100)
         
-        # Enable mouse support
         curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
         
-        # Check for cava
         self.has_cava = self.check_command('cava')
         
-        # Create temp directory for thumbnails & configs
         self.thumb_dir = tempfile.mkdtemp(prefix='yaap_')
         
     def check_command(self, cmd):
@@ -75,10 +71,9 @@ class YouTubeTUI:
             thumb_path = os.path.join(self.thumb_dir, f"{video_id}.jpg")
             urllib.request.urlretrieve(thumb_url, thumb_path)
             
-            # Convert to ASCII using jp2a if available, otherwise simple placeholder
             try:
                 result = subprocess.run(
-                    ['jp2a', '--width=40', '--height=10', thumb_path],
+                    ['jp2a', '--width=100', '--height=50', thumb_path],
                     capture_output=True, text=True, timeout=2
                 )
                 if result.returncode == 0:
@@ -96,8 +91,8 @@ class YouTubeTUI:
         return [
             "╔════════════════════════════════════════╗",
             "║                                        ║",
-            "║              ▶  ♪  ♫                  ║",
-            "║          YouTube Video                 ║",
+            "║                  ♪                     ║",
+            "║               YouTube                  ║",
             "║                                        ║",
             "╚════════════════════════════════════════╝"
         ]
@@ -154,7 +149,7 @@ class YouTubeTUI:
         """Draw search results with thumbnails"""
         height, width = self.stdscr.getmaxyx()
         
-        # Split screen if playing
+    
         if self.playing:
             results_width = width // 2 - 2
         else:
@@ -185,10 +180,10 @@ class YouTubeTUI:
             result = self.results[i]
             is_selected = (i == self.selected_index)
             
-            # Draw thumbnail
+        
             self.draw_thumbnail(y_pos, 3, result.get('id', ''))
             
-            # Draw title and info
+            
             prefix = "▶ " if is_selected else "  "
             title = result.get('title', 'Unknown')[:max(0, results_width - 50)]
             duration = result.get('duration', 'N/A')
@@ -223,7 +218,7 @@ class YouTubeTUI:
         if viz_width <= 4 or viz_x >= width:
             return
         
-        # Draw border
+
         try:
             self.stdscr.attron(curses.color_pair(2))
             if 7 < height:
@@ -234,13 +229,13 @@ class YouTubeTUI:
             if 7 + viz_height - 1 < height:
                 self.stdscr.addstr(7 + viz_height - 1, viz_x, "╚" + "═" * (viz_width - 2) + "╝")
             
-            # Title
+    
             title = " Audio Visualizer "
             if 7 < height:
                 self.stdscr.addstr(7, viz_x + max(0, (viz_width - len(title)) // 2), title, curses.color_pair(2) | curses.A_BOLD)
             self.stdscr.attroff(curses.color_pair(2))
             
-            # Draw cava output
+        
             if self.cava_output:
                 for i, line in enumerate(self.cava_output[:viz_height - 2]):
                     if 8 + i < height - 2:
@@ -249,7 +244,7 @@ class YouTubeTUI:
             pass
     
     def draw_lyrics(self):
-        """Draw live lyrics"""
+        """lyrics"""
         if not self.playing or not self.show_lyrics:
             return
         
@@ -263,7 +258,7 @@ class YouTubeTUI:
             return
         
         try:
-            # Draw border
+        
             self.stdscr.attron(curses.color_pair(3))
             if lyrics_y < height:
                 self.stdscr.addstr(lyrics_y, lyrics_x, "╔" + "═" * (lyrics_width - 2) + "╗")
@@ -273,8 +268,8 @@ class YouTubeTUI:
             if lyrics_y + lyrics_height - 1 < height:
                 self.stdscr.addstr(lyrics_y + lyrics_height - 1, lyrics_x, "╚" + "═" * (lyrics_width - 2) + "╝")
             
-            # Title
-            title = " Live Lyrics "
+        
+            title = "Lyrics "
             if lyrics_y < height:
                 self.stdscr.addstr(
                     lyrics_y,
@@ -284,7 +279,7 @@ class YouTubeTUI:
                 )
             self.stdscr.attroff(curses.color_pair(3))
             
-            # Draw lyrics
+        
             if self.lyrics:
                 start_line = max(0, self.current_lyric_line - 3)
                 for i, line in enumerate(self.lyrics[start_line:start_line + lyrics_height - 2]):
@@ -341,7 +336,7 @@ class YouTubeTUI:
     def search_youtube_fast(self, query: str):
         """Fast YouTube search using yt-dlp - optimized for speed"""
         try:
-            # Use simpler format for speed
+            
             cmd = [
                 'yt-dlp',
                 '--flat-playlist',
@@ -352,11 +347,11 @@ class YouTubeTUI:
                 query
             ]
             
-            # Run search with timeout
+            
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=25)
             
             if result.returncode != 0:
-                # Fallback to slower but more reliable method
+            
                 return self.search_youtube_fallback(query)
             
             results = []
@@ -384,7 +379,7 @@ class YouTubeTUI:
                     }
                     results.append(video_data)
                     
-                    # Download thumbnail in background
+                
                     if video_data['thumbnail']:
                         threading.Thread(
                             target=self.download_thumbnail,
@@ -419,7 +414,7 @@ class YouTubeTUI:
             lines = result.stdout.strip().split('\n')
             results = []
             
-            # Parse output (title, duration, id pattern)
+        
             for i in range(0, len(lines) - 2, 3):
                 try:
                     title = lines[i]
@@ -436,7 +431,7 @@ class YouTubeTUI:
                     }
                     results.append(video_data)
                     
-                    # Download thumbnail
+                    
                     threading.Thread(
                         target=self.download_thumbnail,
                         args=(video_id, video_data['thumbnail']),
@@ -459,7 +454,7 @@ class YouTubeTUI:
         self.current_lyric_line = 0
 
         try:
-            # Build search query from the YouTube title
+        
             query = urllib.parse.quote_plus(title)
             url = f"https://lrclib.net/api/search?q={query}"
 
@@ -473,19 +468,19 @@ class YouTubeTUI:
 
             track = results[0]
 
-            # LRCLIB track object usually has plainLyrics and/or syncedLyrics
+            
             plain = track.get("plainLyrics") or ""
             synced = track.get("syncedLyrics") or ""
 
             lines: List[str] = []
 
             if plain:
-                # Use plain text lyrics if available
+
                 lines = [ln.strip() for ln in plain.splitlines() if ln.strip()]
             elif synced:
-                # Strip [mm:ss.xx] time tags from synced lyrics and keep the text
+                
                 for raw_line in synced.splitlines():
-                    # Remove one or more [time] tags at the start
+                    
                     cleaned = re.sub(r'^\s*(?:\[[0-9:.]+\])+\s*', '', raw_line).strip()
                     if cleaned:
                         lines.append(cleaned)
@@ -497,7 +492,7 @@ class YouTubeTUI:
                 self.current_lyric_line = 0
 
         except Exception:
-            # Network errors / JSON parse / whatever
+            
             self.lyrics = ["Lyrics unavailable (network error or not found)."]
             self.current_lyric_line = 0
     
@@ -507,12 +502,12 @@ class YouTubeTUI:
             return
 
         try:
-            # Create temporary cava config
+            
             config_dir = os.path.join(self.thumb_dir, 'cava_config')
             os.makedirs(config_dir, exist_ok=True)
             config_file = os.path.join(config_dir, 'config')
 
-            # Use raw ascii mode with default delimiters
+            
             config_text = """
 [general]
 bars = 40
@@ -531,16 +526,16 @@ data_format = ascii
 
             cava_cmd = ['cava', '-p', config_file]
 
-            # text=True so we get decoded strings line-by-line
+        
             process = subprocess.Popen(
                 cava_cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL,
                 text=True,
-                bufsize=1  # line buffered
+                bufsize=1  
             )
 
-            # Unicode blocks for bar heights (0..7)
+            
             blocks = ['▁', '▂', '▃', '▄', '▅', '▆', '▇', '█']
 
             while self.playing and process.poll() is None:
@@ -553,7 +548,6 @@ data_format = ascii
                     continue
 
                 try:
-                    # Values like "0;12;400;..." in some range
                     raw_vals = [int(v) for v in line.split(';') if v.strip()]
                     if not raw_vals:
                         continue
@@ -570,24 +564,19 @@ data_format = ascii
                         vals.append(level)
 
                     viz_line = ''.join(blocks[level] for level in vals)
-
-                    # Repeat the same line a few times to give "height"
                     self.cava_output = [viz_line] * 10
 
                 except Exception:
-                    # Ignore malformed lines and keep going
                     continue
 
                 time.sleep(0.03)
-
-            # Clean up when playback stops
+                
             try:
                 process.terminate()
             except Exception:
                 pass
 
         except Exception:
-            # If anything goes wrong once, just disable cava so the UI keeps working
             self.has_cava = False
             self.cava_output = []
     
@@ -611,15 +600,12 @@ data_format = ascii
             self.playing = True
             self.current_video = video
             
-            # Fetch lyrics
             self.fetch_lyrics(video['title'])
             
-            # Start cava in thread
             if self.has_cava:
                 self.cava_thread = threading.Thread(target=self.update_cava_output, daemon=True)
                 self.cava_thread.start()
             
-            # Start lyrics animation (simple auto-scroll)
             threading.Thread(target=self.animate_lyrics, daemon=True).start()
             
         except Exception:
@@ -650,14 +636,12 @@ data_format = ascii
             _, x, y, _, bstate = curses.getmouse()
             height, width = self.stdscr.getmaxyx()
             
-            # Click on search box to activate
             if y == 3 and 11 <= x < width - 2:
                 self.search_mode = True
                 self.search_input = self.search_query
                 curses.curs_set(1)
                 return
             
-            # Click on results to select/play
             if self.results and y >= 7:
                 available_height = height - 8
                 results_per_page = max(1, available_height // 8)
@@ -693,7 +677,6 @@ data_format = ascii
                     self.search_mode = False
                     curses.curs_set(0)
                     
-                    # Show searching message
                     self.stdscr.addstr(5, 2, "Searching..." + " " * 50, curses.color_pair(3))
                     self.stdscr.refresh()
                     
