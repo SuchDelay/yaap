@@ -1,7 +1,6 @@
 
 """
 YAAP - Yet Another Audio Player
-Terminal-based YouTube music player with integrated Cava visualizer and lyrics
 """
 
 import curses
@@ -73,7 +72,7 @@ class YouTubeTUI:
             
             try:
                 result = subprocess.run(
-                    ['jp2a', '--width=100', '--height=50', thumb_path],
+                    ['jp2a', '--width=40', '--height=10', thumb_path],
                     capture_output=True, text=True, timeout=2
                 )
                 if result.returncode == 0:
@@ -230,7 +229,7 @@ class YouTubeTUI:
                 self.stdscr.addstr(7 + viz_height - 1, viz_x, "╚" + "═" * (viz_width - 2) + "╝")
             
     
-            title = " Audio Visualizer "
+            title = ""
             if 7 < height:
                 self.stdscr.addstr(7, viz_x + max(0, (viz_width - len(title)) // 2), title, curses.color_pair(2) | curses.A_BOLD)
             self.stdscr.attroff(curses.color_pair(2))
@@ -614,7 +613,7 @@ data_format = ascii
     def animate_lyrics(self):
         """Animate lyrics scrolling"""
         while self.playing and self.lyrics:
-            time.sleep(3)
+            time.sleep(10)
             self.current_lyric_line = (self.current_lyric_line + 1) % len(self.lyrics)
             
     def stop_playback(self):
