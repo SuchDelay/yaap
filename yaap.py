@@ -259,7 +259,6 @@ class YouTubeTUI:
             y_pos += 8
 
     def draw_progress_bar(self, width: int) -> str:
-        """Return a progress bar string with current time and duration."""
         cur = self.format_time(self.playback_time)
         dur = self.format_time(self.playback_duration)
 
