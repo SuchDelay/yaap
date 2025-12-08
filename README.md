@@ -9,7 +9,7 @@ YAAP requires the following packages:
 - `yt-dlp`
 - `cava`
 - `jp2a`
-- `python` (Python 3)
+- `python`
 
 ---
 
@@ -30,7 +30,7 @@ sudo apt install mpv cava jp2a python3 python3-pip yt-dlp
 # Clone and Run
 
 ```bash
-git clone https://github.com/SuchDelay/yaap
+git clone https://github.com/SuchDelay/yaap.git
 cd yaap
-python3 yaap.py
+python yaap.py
 ```
