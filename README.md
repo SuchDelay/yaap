@@ -17,6 +17,8 @@ sudo pacman -S mpv yt-dlp cava jp2a python
 sudo apt install mpv cava jp2a python3 python3-pip yt-dlp
 
 ## Clone and Run
-git clone git@github.com:SuchDelay/yaap.git
-cd yaap
+
+`git clone git@github.com:SuchDelay/yaap.git
+cd yaap`
+
 python3 yaap.py
