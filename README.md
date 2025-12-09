@@ -20,7 +20,7 @@ YAAP requires the following packages:
 sudo pacman -S mpv yt-dlp cava jp2a python
 ```
 
-## Ubuntu / Debian
+## Ubuntu
 ```bash
 sudo apt install mpv cava jp2a python3 python3-pip yt-dlp
 ```
