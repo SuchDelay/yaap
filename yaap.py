@@ -15,7 +15,7 @@ import re
 from typing import List, Dict, Optional
 import sys
 from pathlib import Path
-import socket  # <- for mpv IPC
+import socket  
 
 
 class YouTubeTUI:
@@ -37,12 +37,12 @@ class YouTubeTUI:
         self.current_lyric_line = 0
         self.show_lyrics = True
 
-        # MPV IPC + timing + synced lyrics
+      
         self.mpv_socket_path: Optional[str] = None
         self.playback_time: float = 0.0
         self.playback_duration: float = 0.0
-        self.synced_lyrics: List[tuple] = []  # (seconds, text)
-
+        self.synced_lyrics: List[tuple] = [] 
+        
         curses.start_color()
         curses.init_pair(1, curses.COLOR_CYAN, curses.COLOR_BLACK)
         curses.init_pair(2, curses.COLOR_GREEN, curses.COLOR_BLACK)
@@ -262,7 +262,7 @@ class YouTubeTUI:
         cur = self.format_time(self.playback_time)
         dur = self.format_time(self.playback_duration)
 
-        # Leave space for times and spaces around bar
+      
         bar_width = max(10, width - len(cur) - len(dur) - 4)
         pos = 0
         if self.playback_duration > 0:
@@ -287,13 +287,13 @@ class YouTubeTUI:
         height, width = self.stdscr.getmaxyx()
         viz_x = width // 2 + 2
         viz_width = width // 2 - 4
-        viz_height = 18  # total height including border
+        viz_height = 18 
 
         if viz_width <= 10 or viz_x >= width:
             return
 
         try:
-            # Draw outer box
+         
             self.stdscr.attron(curses.color_pair(2))
             if 7 < height:
                 self.stdscr.addstr(
@@ -315,7 +315,7 @@ class YouTubeTUI:
                     "╚" + "═" * (viz_width - 2) + "╝",
                 )
 
-            # Draw progress bar at the top inner line (inside the box)
+       
             if 8 < height:
                 inner_width = max(0, viz_width - 2)
                 progress = self.draw_progress_bar(inner_width)
@@ -326,12 +326,12 @@ class YouTubeTUI:
                     curses.color_pair(3) | curses.A_BOLD,
                 )
 
-            # Visualizer area below the progress bar
+          
             top_inner = 9
-            bottom_inner = 7 + viz_height - 2  # last inner row
+            bottom_inner = 7 + viz_height - 2  
 
             if self.cava_output:
-                # We use the first cava_output line (levels) and turn it into vertical bars
+             
                 line = self.cava_output[0][: max(0, viz_width - 2)]
                 blocks = "▁▂▃▄▅▆▇█"
 
@@ -340,13 +340,13 @@ class YouTubeTUI:
                         break
 
                     if ch in blocks:
-                        level = blocks.index(ch) + 1  # 1..8
+                        level = blocks.index(ch) + 1  
                     else:
                         level = 1
 
-                    # Map level to number of rows to fill
+              
                     max_rows = max(1, bottom_inner - top_inner)
-                    # Scale 1..8 -> 1..max_rows
+                 
                     height_cols = max(1, int(level * max_rows / 8))
 
                     for v in range(height_cols):
@@ -364,7 +364,7 @@ class YouTubeTUI:
 
             self.stdscr.attroff(curses.color_pair(2))
         except Exception:
-            # If anything goes wrong, don't crash the UI
+       
             pass
 
     def draw_lyrics(self):
@@ -649,7 +649,7 @@ class YouTubeTUI:
             plain = track.get("plainLyrics") or ""
             synced = track.get("syncedLyrics") or ""
 
-            # Prefer synced lyrics if available
+        
             if synced:
                 synced_list: List[tuple] = []
 
